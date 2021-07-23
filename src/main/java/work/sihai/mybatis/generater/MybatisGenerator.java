@@ -1,13 +1,18 @@
 package work.sihai.mybatis.generater;
 
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.SimpleAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.builder.GeneratorBuilder;
 import com.baomidou.mybatisplus.generator.config.po.LikeTable;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
+import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.AbstractTemplateEngine;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import com.baomidou.mybatisplus.generator.fill.Column;
+import com.baomidou.mybatisplus.generator.fill.Property;
 
 /**
  * @author yangjiahao
@@ -15,19 +20,16 @@ import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 public class MybatisGenerator {
 
     private static final String URL = "jdbc:mysql://localhost:13306/mageline_promotion_dev?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai";
-    private static final String DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
     private static final String USER_NAME = "mgl_dev";
     private static final String PASSWORD = "vpW6cElr1gZMMEp2";
 
-
-    private static final String PROJECT_PATH = "";
+    private static final String PROJECT_PATH = "C:\\Users\\hu_19\\learn\\gen";
 
     private static final String AUTHOR = "karl";
     private static final String COMMENT_DATE_PATTERN = "yyyy-MM-dd";
 
-
-    private static final String PARENT_NAME = "";
-    private static final String MODULE_NAME = "";
+    private static final String PARENT_NAME = "marketing";
+    private static final String MODULE_NAME = "promotion";
     private static final String CONTROLLER_NAME = "controller";
     private static final String SERVICE_NAME = "service";
     private static final String SERVICE_IMPL_NAME = "service.impl";
@@ -35,25 +37,22 @@ public class MybatisGenerator {
     private static final String XML_NAME = "mapper.xml";
     private static final String ENTITY_NAME = "entity";
 
-
-    private static final String CONTROLLER_TEMPLATE = "/templates/controller.java";
-    private static final String SERVICE_TEMPLATE = "/templates/service.java";
-    private static final String SERVICE_IMPL_TEMPLATE = "/templates/serviceImpl.java";
-    private static final String MAPPER_TEMPLATE = "/templates/mapper.java";
-    private static final String MAPPER_XML_TEMPLATE = "/templates/mapper.xml";
-    private static final String ENTITY_TEMPLATE = "/templates/entity.java";
-
-
-
+    private static final String CONTROLLER_TEMPLATE = "/templates/controller.ftl";
+    private static final String SERVICE_TEMPLATE = "/templates/service.ftl";
+    private static final String SERVICE_IMPL_TEMPLATE = "/templates/serviceImpl.ftl";
+    private static final String MAPPER_TEMPLATE = "/templates/mapper.ftl";
+    private static final String MAPPER_XML_TEMPLATE = "/templates/mapper.ftl";
+    private static final String ENTITY_TEMPLATE = "/templates/entity.ftl";
 
     private static final String TABLE_LIKE = "";
     private static final String TABLE_NOT_LIKE = "";
     private static final String CONTROLLER_SUPER_CLASS = "";
+    private static final String SERVICE_SUPER_CLASS = "";
+    private static final String SERVICE_IMPL_SUPER_CLASS = "";
+    private static final String MAPPER_SUPER_CLASS = "";
+    private static final String ENTITY_SUPER_CLASS = "";
 
-
-
-
-
+    private static final String FREEMARKER_TEMPLATE_PATH = "/templates";
 
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
 
@@ -96,20 +95,20 @@ public class MybatisGenerator {
             public AbstractTemplateEngine templateEngine() {
                 return getTemplateEngine();
             }
-
-
         }.execute();
 
     }
 
     private static AbstractTemplateEngine getTemplateEngine() {
         FreemarkerTemplateEngine templateEngine = new FreemarkerTemplateEngine();
+        templateEngine.templateFilePath(FREEMARKER_TEMPLATE_PATH);
         return templateEngine;
     }
 
 
     private static IConfigBuilder<InjectionConfig> getInjectBuilder() {
         InjectionConfig.Builder builder = new InjectionConfig.Builder();
+        builder.beforeOutputFile((tableInfo,map)->{});
         return builder;
     }
 
@@ -127,33 +126,36 @@ public class MybatisGenerator {
                 .addExclude();
         builder.controllerBuilder()
                 .superClass(CONTROLLER_SUPER_CLASS)
-                .formatFileName()
-                .convertFileName()
+//                .formatFileName()
+//                .convertFileName()
                 .enableHyphenStyle()
                 .enableRestStyle();
         builder.serviceBuilder()
-                .superServiceImplClass()
-                .superServiceClass()
-                .convertServiceFileName()
-                .convertServiceImplFileName()
-                .formatServiceFileName()
-                .formatServiceImplFileName();
+                .superServiceImplClass(SERVICE_IMPL_SUPER_CLASS)
+                .superServiceClass(SERVICE_SUPER_CLASS)
+//                .convertServiceFileName()
+//                .convertServiceImplFileName()
+//                .formatServiceFileName()
+//                .formatServiceImplFileName()
+        ;
         builder.mapperBuilder()
-                .superClass()
-                .cache()
-                .convertMapperFileName()
-                .convertXmlFileName()
+                .superClass(MAPPER_SUPER_CLASS)
+//                .cache()
+//                .convertMapperFileName()
+//                .convertXmlFileName()
                 .enableBaseColumnList()
                 .enableBaseResultMap()
-                .formatXmlFileName()
-                .formatMapperFileName();
+//                .formatXmlFileName()
+//                .formatMapperFileName()
+               ;
         builder.entityBuilder()
                 .addIgnoreColumns()
-                .convertFileName()
-                .superClass()
-                .addSuperEntityColumns()
-                .addTableFills()
-                .columnNaming()
+//                .convertFileName()
+                .superClass(ENTITY_SUPER_CLASS)
+                .addSuperEntityColumns("deleted","version","create_time","create_user_id","create_user_name","update_time","update_user_id","update_User_name")
+                .addTableFills(new Column("create_time", FieldFill.INSERT))
+                .addTableFills(new Property("UpdateTime",FieldFill.INSERT_UPDATE))
+                .columnNaming(NamingStrategy.underline_to_camel)
                 .enableActiveRecord()
                 .enableChainModel()
                 .enableColumnConstant()
@@ -161,13 +163,13 @@ public class MybatisGenerator {
                 .enableRemoveIsPrefix()
                 .enableSerialVersionUID()
                 .enableTableFieldAnnotation()
-                .idType()
-                .logicDeleteColumnName()
-                .logicDeletePropertyName()
-                .nameConvert()
-                .naming()
-                .versionColumnName()
-                .versionPropertyName()
+                .idType(IdType.AUTO)
+                .logicDeleteColumnName("deleted")
+                .logicDeletePropertyName("deleted")
+//                .nameConvert()
+                .naming(NamingStrategy.underline_to_camel)
+                .versionColumnName("version")
+                .versionPropertyName("version");
         return builder;
     }
 
