@@ -126,7 +126,7 @@ public class MybatisGenerator {
                 .addInclude()
                 .addExclude();
         builder.controllerBuilder()
-                .superClass()
+                .superClass(CONTROLLER_SUPER_CLASS)
                 .formatFileName()
                 .convertFileName()
                 .enableHyphenStyle()
